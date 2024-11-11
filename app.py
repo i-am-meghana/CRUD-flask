@@ -27,8 +27,10 @@ class MyTask(db.Model): #mytask represents a database record
         return f"Task{self.id}"
 
 
+
+
 #buildin on top of the sql connection to handle http request. what does handling http request mean?
-@app.route("/", methods=["POST","GET"])
+@app.route("/", methods=["POST","GET"]) #route in an endpoint
 #user simply visitn page is GET request
 #user submitting new task is POST req, store in database
 def index():
@@ -50,14 +52,40 @@ def index():
             print(f"ERROR:{e}")
             return f"ERROR:{e}"
     else:
-        #tasks is a local variable inside route func. holds result of query
+        #tasks is a local variable inside route func. holds result of query we want to feed this to index.html
         tasks = MyTask.query.order_by(MyTask.created).all()
         #this tasks is a template variable you are passing to the HTML file
         #cann be accessed using jinja like {{tasks}} to display on web page
-        return render_template('index.html', tasks = tasks)
+        return render_template('index.html', tasks = tasks) #passing keyword arguments: dynamially redner this in the html file
+        #name for keyword argument you have to access in the html file. go into html file and to display them use double {} and put it in that
 
 
 
+
+@app.route("/delete/<int:id>") #flask assumes/defaults to get method if not specified
+#url processors means u can hav variable in url itself that u can handle in the ducntion
+def delete(id:int): #id is paramater. this is called type hinting. when i click the delete button a req is send to this and this func gets trigegred
+    
+    delete_task = MyTask.query.get_or_404(id) #where does flask get value fo id from
+    try:
+        db.session.delete(delete_task)
+        db.session.commit()
+        return redirect("/")
+    except Exception as e:
+        return f"ERROR:{e}"
+
+@app.route("/edit/<int:id>", methods = ["GET","POST"])
+def edit(id:int):
+    task = MyTask.query.get_or_404(id)
+    if request.method == "POST":
+        task.content = request.form['content']
+        try:
+            db.session.commit()
+            return redirect("/")
+        except Exception as e:
+            return f"ERROR:{e}"
+    else:
+        return render_template('edit.html', task = task)
 
 
     return render_template("index.html")

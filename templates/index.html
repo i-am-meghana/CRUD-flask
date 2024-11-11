@@ -6,7 +6,7 @@
 <h1>hello</h1>
 <div class="content">
     <h1>Task manager</h1>
-    {% if tasks | length < 1 %}
+    {% if tasks | length < 1 %} 
     <h3>there are no tasks</h3>
     {% else %}
     <table>
@@ -22,7 +22,7 @@
                 <td>
                     <a href="/delete/{{task.id}}">Delete</a>
                     <br>
-                    <a href="/update/{{task.id}}">Edit</a>
+                    <a href="/edit/{{task.id}}">Edit</a>
                 </td>
             </tr>
         {% endfor %}
